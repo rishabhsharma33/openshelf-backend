@@ -1,0 +1,20 @@
+meta {
+  name: Delete Cover Image
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/books/{{bookId}}/image
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Removes the cover image from Cloudinary and clears Book.coverImage.
+  400 if the book has no cover image to remove.
+}

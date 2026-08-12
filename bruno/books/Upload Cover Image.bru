@@ -1,0 +1,26 @@
+meta {
+  name: Upload Cover Image
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/books/{{bookId}}/image
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:multipart-form {
+  image: @file(books/fixtures/test-cover.png)
+}
+
+docs {
+  Uploads a cover image to Cloudinary and sets Book.coverImage to the
+  resulting secure_url. Owner-only; validates file type
+  (jpeg/png/webp) and size (max 5MB). Re-running this overwrites the
+  same Cloudinary asset rather than creating a new one.
+}
