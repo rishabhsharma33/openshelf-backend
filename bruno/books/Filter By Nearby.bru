@@ -1,0 +1,26 @@
+meta {
+  name: Filter By Nearby
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/books?nearMe=true
+  body: none
+  auth: bearer
+}
+
+params:query {
+  nearMe: true
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Convenience filter: auto-derives city/state from the current user's
+  own profile (set by "Set My Location" above) instead of passing them
+  explicitly. Errors with 400 if combined with city/state, or if the
+  user has neither set on their profile.
+}

@@ -1,0 +1,32 @@
+meta {
+  name: Set My Location
+  type: http
+  seq: 6
+}
+
+patch {
+  url: {{baseUrl}}/users/me
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "city": "Mumbai",
+    "state": "Maharashtra"
+  }
+}
+
+docs {
+  Sets a location on the current user so the Filter By City and Filter
+  By Nearby requests below have something deterministic to match,
+  regardless of whether the users folder has run yet.
+}

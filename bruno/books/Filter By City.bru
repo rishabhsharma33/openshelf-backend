@@ -1,0 +1,24 @@
+meta {
+  name: Filter By City
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/books?city=mumbai
+  body: none
+  auth: bearer
+}
+
+params:query {
+  city: mumbai
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  city/state are case-insensitive exact matches against the book
+  owner's profile location, set by "Set My Location" above.
+}
