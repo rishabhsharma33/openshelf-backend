@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma, type User } from '@prisma/client';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { FindBooksQueryDto } from './dto/find-books-query.dto';
@@ -20,7 +21,24 @@ const bookOwnerSelect = {
 
 @Injectable()
 export class BooksService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
+
+  private async findOwnedBook(id: string, userId: string) {
+    const book = await this.prisma.book.findUnique({ where: { id } });
+
+    if (!book) {
+      throw new NotFoundException('Book not found');
+    }
+
+    if (book.ownerId !== userId) {
+      throw new ForbiddenException('You do not own this book');
+    }
+
+    return book;
+  }
 
   create(ownerId: string, createBookDto: CreateBookDto) {
     return this.prisma.book.create({
@@ -95,15 +113,7 @@ export class BooksService {
   }
 
   async update(id: string, userId: string, updateBookDto: UpdateBookDto) {
-    const book = await this.prisma.book.findUnique({ where: { id } });
-
-    if (!book) {
-      throw new NotFoundException('Book not found');
-    }
-
-    if (book.ownerId !== userId) {
-      throw new ForbiddenException('You do not own this book');
-    }
+    await this.findOwnedBook(id, userId);
 
     return this.prisma.book.update({
       where: { id },
@@ -113,15 +123,7 @@ export class BooksService {
   }
 
   async remove(id: string, userId: string) {
-    const book = await this.prisma.book.findUnique({ where: { id } });
-
-    if (!book) {
-      throw new NotFoundException('Book not found');
-    }
-
-    if (book.ownerId !== userId) {
-      throw new ForbiddenException('You do not own this book');
-    }
+    await this.findOwnedBook(id, userId);
 
     try {
       await this.prisma.book.delete({ where: { id } });
@@ -142,5 +144,36 @@ export class BooksService {
     }
 
     return { message: 'Book deleted successfully' };
+  }
+
+  async uploadImage(id: string, userId: string, file: Express.Multer.File) {
+    await this.findOwnedBook(id, userId);
+
+    const result = await this.cloudinaryService.uploadImage(
+      file.buffer,
+      `book-${id}`,
+    );
+
+    return this.prisma.book.update({
+      where: { id },
+      data: { coverImage: result.secure_url },
+      include: { owner: { select: bookOwnerSelect } },
+    });
+  }
+
+  async removeImage(id: string, userId: string) {
+    const book = await this.findOwnedBook(id, userId);
+
+    if (!book.coverImage) {
+      throw new BadRequestException('This book has no cover image to remove');
+    }
+
+    await this.cloudinaryService.destroyImage(`book-${id}`);
+
+    return this.prisma.book.update({
+      where: { id },
+      data: { coverImage: null },
+      include: { owner: { select: bookOwnerSelect } },
+    });
   }
 }
