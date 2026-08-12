@@ -1,10 +1,11 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, type User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
 import { FindBooksQueryDto } from './dto/find-books-query.dto';
@@ -31,8 +32,33 @@ export class BooksService {
     });
   }
 
-  findAll(query: FindBooksQueryDto) {
-    const { search, genre, language, condition, status, sortBy } = query;
+  findAll(query: FindBooksQueryDto, currentUser: User) {
+    const { search, genre, language, condition, status, sortBy, nearMe } =
+      query;
+    let { city, state } = query;
+
+    if (nearMe) {
+      if (city || state) {
+        throw new BadRequestException(
+          'Cannot combine nearMe with explicit city or state filters',
+        );
+      }
+
+      if (currentUser.city) {
+        city = currentUser.city;
+      } else if (currentUser.state) {
+        state = currentUser.state;
+      } else {
+        throw new BadRequestException(
+          'Set your city or state in your profile to use nearMe',
+        );
+      }
+    }
+
+    const ownerFilter: Prisma.UserWhereInput = {
+      ...(city && { city: { equals: city, mode: 'insensitive' } }),
+      ...(state && { state: { equals: state, mode: 'insensitive' } }),
+    };
 
     return this.prisma.book.findMany({
       where: {
@@ -48,6 +74,7 @@ export class BooksService {
         }),
         ...(condition && { condition }),
         ...(status && { status }),
+        ...(Object.keys(ownerFilter).length > 0 && { owner: ownerFilter }),
       },
       include: { owner: { select: bookOwnerSelect } },
       orderBy: { createdAt: sortBy === 'oldest' ? 'asc' : 'desc' },

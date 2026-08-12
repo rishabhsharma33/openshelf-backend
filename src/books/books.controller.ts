@@ -28,8 +28,8 @@ export class BooksController {
   }
 
   @Get()
-  findAll(@Query() query: FindBooksQueryDto) {
-    return this.booksService.findAll(query);
+  findAll(@Query() query: FindBooksQueryDto, @CurrentUser() user: User) {
+    return this.booksService.findAll(query, user);
   }
 
   @Get(':id')
