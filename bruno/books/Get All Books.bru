@@ -1,0 +1,15 @@
+meta {
+  name: Get All Books
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/books
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

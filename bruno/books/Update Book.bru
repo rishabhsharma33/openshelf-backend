@@ -1,0 +1,27 @@
+meta {
+  name: Update Book
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/books/{{bookId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "description": "Updated description.",
+    "condition": "LIKE_NEW",
+    "status": "UNAVAILABLE"
+  }
+}
