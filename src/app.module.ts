@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { BooksModule } from './books/books.module';
+import { LendingRequestsModule } from './lending-requests/lending-requests.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,6 +16,7 @@ import { BooksModule } from './books/books.module';
     PrismaModule,
     AuthModule,
     BooksModule,
+    LendingRequestsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
