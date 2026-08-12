@@ -1,0 +1,26 @@
+meta {
+  name: Filter Books
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/books?genre=Technology&condition=GOOD
+  body: none
+  auth: bearer
+}
+
+params:query {
+  genre: Technology
+  condition: GOOD
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Filters are exact match (genre/language are case-insensitive,
+  condition/status must be a valid enum value). Matches the book created
+  by "Create Book" earlier in this folder.
+}

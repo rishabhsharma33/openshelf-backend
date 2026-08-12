@@ -1,0 +1,25 @@
+meta {
+  name: Search Books
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/books?search=Pragmatic
+  body: none
+  auth: bearer
+}
+
+params:query {
+  search: Pragmatic
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Case-insensitive substring match against title or author. Matches the
+  book created by "Create Book" earlier in this folder ("The Pragmatic
+  Programmer").
+}

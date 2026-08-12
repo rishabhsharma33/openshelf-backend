@@ -1,0 +1,24 @@
+meta {
+  name: Sort Books Oldest
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/books?sortBy=oldest
+  body: none
+  auth: bearer
+}
+
+params:query {
+  sortBy: oldest
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  sortBy accepts "newest" (default, most recently created first) or
+  "oldest". Sorts by createdAt.
+}
