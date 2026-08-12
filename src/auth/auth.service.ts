@@ -7,10 +7,14 @@ import { RegisterDto } from './dto/register.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register(registerDto: RegisterDto) {
     const existingUser = await this.prisma.user.findUnique({
@@ -68,14 +72,24 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    const payload = {
+      sub: user.id,
+      email: user.email,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
     return {
       message: 'Login successful',
       data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+        accessToken,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        },
       },
     };
   }
