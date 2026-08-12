@@ -176,6 +176,25 @@ Open the `bruno/` folder in the [Bruno app](https://www.usebruno.com/) to run re
 | ------ | --------- | ---- | ---------------------------------- |
 | GET    | `/health` | —    | Liveness check; pings the database |
 
+## CI
+
+`.github/workflows/ci.yml` runs on every push/PR to `dev` and `main`: type check, lint, unit tests, and build. It needs no secrets — `prisma generate` only reads `schema.prisma` and doesn't touch the database, so nothing in CI talks to Neon or Cloudinary. The Bruno collection (real API + real database + real Cloudinary) stays a manual/local step, not part of CI.
+
+## Deployment
+
+Deployed on [Render](https://render.com/) as a plain Node web service — no Docker. `render.yaml` in the repo root is a Render Blueprint describing the service; either use it directly (Render dashboard → **New** → **Blueprint** → point at this repo) or configure a Web Service manually with the same settings:
+
+- **Branch:** `dev` (per this project's workflow — `dev` is the branch that gets deployed, `main` is not)
+- **Build command:** `npm ci && npx prisma generate && npx prisma migrate deploy && npm run build`
+- **Start command:** `npm run start:prod`
+- **Health check path:** `/health`
+
+`prisma migrate deploy` (not `migrate dev`) runs on every deploy, before the new build starts serving traffic — it applies any pending migrations non-interactively against `DIRECT_URL` and never prompts or resets data.
+
+Whichever way you set it up, add all the variables listed in [Environment Variables](#environment-variables) in Render's dashboard (**Environment** tab) — `render.yaml` lists the required keys but deliberately doesn't store their values (`sync: false`), since those are secrets. Don't set `PORT` — Render injects its own and the app already respects `process.env.PORT`.
+
+Render auto-deploys on every push to `dev` once connected, so merging a feature branch into `dev` and pushing (the existing workflow) is the entire deploy step going forward.
+
 ## Status
 
 🚧 Actively under development.
