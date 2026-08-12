@@ -1,0 +1,28 @@
+meta {
+  name: Login Borrower
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "jane.doe@example.com",
+    "password": "SecurePass123"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.data && res.body.data.accessToken) {
+    bru.setEnvVar("borrowerAccessToken", res.body.data.accessToken);
+  }
+}

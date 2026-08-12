@@ -1,0 +1,15 @@
+meta {
+  name: Return Book
+  type: http
+  seq: 9
+}
+
+patch {
+  url: {{baseUrl}}/lending-requests/{{lendingRequestId}}/return
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

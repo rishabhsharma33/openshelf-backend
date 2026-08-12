@@ -1,0 +1,22 @@
+meta {
+  name: Cancel Request
+  type: http
+  seq: 11
+}
+
+patch {
+  url: {{baseUrl}}/lending-requests/{{lendingRequestId}}/cancel
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{borrowerAccessToken}}
+}
+
+docs {
+  Alternate branch, not part of the main chained flow. Only works on a
+  PENDING request, so running the whole folder top-to-bottom will hit this
+  after Accept/Return already resolved the request (expect a 400). Run this
+  manually against a fresh pending request to test the cancel path.
+}

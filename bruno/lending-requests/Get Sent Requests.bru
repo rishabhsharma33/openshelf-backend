@@ -1,0 +1,15 @@
+meta {
+  name: Get Sent Requests
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/lending-requests/sent
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{borrowerAccessToken}}
+}

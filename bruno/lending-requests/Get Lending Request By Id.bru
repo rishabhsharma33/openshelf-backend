@@ -1,0 +1,15 @@
+meta {
+  name: Get Lending Request By Id
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/lending-requests/{{lendingRequestId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,0 +1,15 @@
+meta {
+  name: Get Received Requests
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/lending-requests/received
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

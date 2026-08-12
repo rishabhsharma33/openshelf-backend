@@ -1,0 +1,33 @@
+meta {
+  name: Create Book For Lending
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/books
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "title": "Refactoring",
+    "author": "Martin Fowler",
+    "condition": "GOOD"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.id) {
+    bru.setEnvVar("lendingBookId", res.body.id);
+  }
+}

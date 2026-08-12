@@ -1,0 +1,15 @@
+meta {
+  name: Accept Request
+  type: http
+  seq: 8
+}
+
+patch {
+  url: {{baseUrl}}/lending-requests/{{lendingRequestId}}/accept
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}

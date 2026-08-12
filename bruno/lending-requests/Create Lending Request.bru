@@ -1,0 +1,32 @@
+meta {
+  name: Create Lending Request
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/lending-requests
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{borrowerAccessToken}}
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "bookId": "{{lendingBookId}}",
+    "message": "Can I borrow this?"
+  }
+}
+
+script:post-response {
+  if (res.body && res.body.id) {
+    bru.setEnvVar("lendingRequestId", res.body.id);
+  }
+}

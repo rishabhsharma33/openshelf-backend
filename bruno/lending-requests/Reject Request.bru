@@ -1,0 +1,22 @@
+meta {
+  name: Reject Request
+  type: http
+  seq: 10
+}
+
+patch {
+  url: {{baseUrl}}/lending-requests/{{lendingRequestId}}/reject
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+docs {
+  Alternate branch, not part of the main chained flow. Only works on a
+  PENDING request, so running the whole folder top-to-bottom will hit this
+  after Accept/Return already resolved the request (expect a 400). Run this
+  manually against a fresh pending request to test the reject path.
+}
