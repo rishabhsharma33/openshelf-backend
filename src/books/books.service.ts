@@ -7,6 +7,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateBookDto } from './dto/create-book.dto';
+import { FindBooksQueryDto } from './dto/find-books-query.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 
 const bookOwnerSelect = {
@@ -30,10 +31,26 @@ export class BooksService {
     });
   }
 
-  findAll() {
+  findAll(query: FindBooksQueryDto) {
+    const { search, genre, language, condition, status, sortBy } = query;
+
     return this.prisma.book.findMany({
+      where: {
+        ...(search && {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' } },
+            { author: { contains: search, mode: 'insensitive' } },
+          ],
+        }),
+        ...(genre && { genre: { equals: genre, mode: 'insensitive' } }),
+        ...(language && {
+          language: { equals: language, mode: 'insensitive' },
+        }),
+        ...(condition && { condition }),
+        ...(status && { status }),
+      },
       include: { owner: { select: bookOwnerSelect } },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: sortBy === 'oldest' ? 'asc' : 'desc' },
     });
   }
 
