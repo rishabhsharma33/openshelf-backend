@@ -8,18 +8,96 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  password     String
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String
 
-  phone        String?
-  city         String?
-  state        String?
+  phone String?
+  city  String?
+  state String?
 
   profileImage String?
   bio          String?
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  books            Book[]
+  sentRequests     LendingRequest[] @relation("BorrowRequests")
+  receivedRequests LendingRequest[] @relation("LentRequests")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BookCondition {
+  NEW
+  LIKE_NEW
+  GOOD
+  FAIR
+  POOR
+}
+
+enum BookStatus {
+  AVAILABLE
+  BORROWED
+  UNAVAILABLE
+}
+
+enum LendingRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  RETURNED
+}
+
+model Book {
+  id          String        @id @default(uuid())
+  title       String
+  author      String
+  isbn        String?
+  description String?
+  coverImage  String?
+  genre       String?
+  language    String?
+  condition   BookCondition @default(GOOD)
+  status      BookStatus    @default(AVAILABLE)
+
+  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId String
+
+  lendingRequests LendingRequest[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model LendingRequest {
+  id      String               @id @default(uuid())
+  status  LendingRequestStatus @default(PENDING)
+  message String?
+
+  book   Book   @relation(fields: [bookId], references: [id])
+  bookId String
+
+  requester   User   @relation("BorrowRequests", fields: [requesterId], references: [id])
+  requesterId String
+
+  owner   User   @relation("LentRequests", fields: [ownerId], references: [id])
+  ownerId String
+
+  requestedAt DateTime  @default(now())
+  respondedAt DateTime?
+  dueDate     DateTime?
+  returnedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([bookId])
+  @@index([requesterId])
+  @@index([ownerId])
+  @@index([status])
 }
