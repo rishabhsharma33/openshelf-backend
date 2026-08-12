@@ -13,6 +13,10 @@ class EnvironmentVariables {
   @IsNotEmpty()
   DATABASE_URL: string;
 
+  @IsString()
+  @IsNotEmpty()
+  DIRECT_URL: string;
+
   @IsOptional()
   @IsInt()
   @Min(0)
